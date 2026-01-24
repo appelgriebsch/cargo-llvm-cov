@@ -697,7 +697,7 @@ fn merge_profraw(cx: &Context) -> Result<()> {
         if cx.ws.profdata_file.exists() {
             return Ok(());
         }
-        warn!(
+        bail!(
             "not found *.profraw files in {}; this may occur if target directory is accidentally \
              cleared, or running report subcommand without running any tests or binaries",
             cx.ws.target_dir
@@ -853,7 +853,7 @@ fn object_files(cx: &Context) -> Result<Vec<OsString>> {
             }
         }
         if binaries_metadata.is_empty() {
-            warn!("not found binaries-metadata.json in nextest archive {archive_file:?}");
+            bail!("not found binaries-metadata.json in nextest archive {archive_file:?}");
         } else {
             match serde_json::from_slice::<BinariesMetadata>(&binaries_metadata) {
                 // TODO: what multiple base_output_directories means?
@@ -879,7 +879,7 @@ fn object_files(cx: &Context) -> Result<Vec<OsString>> {
                     auto_detect_profile = true;
                 }
                 res => {
-                    warn!(
+                    bail!(
                         "found binaries-metadata.json in nextest archive {archive_file:?}, but has unsupported or incompatible format: {res:?}"
                     );
                 }
