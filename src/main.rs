@@ -32,7 +32,7 @@ use crate::{
     context::Context,
     metadata::Metadata,
     process::ProcessBuilder,
-    regex_vec::{RegexVec, RegexVecBuilder},
+    regex_builder::RegexBuilder,
     term::Coloring,
 };
 
@@ -50,7 +50,7 @@ mod demangler;
 mod env;
 mod fs;
 mod metadata;
-mod regex_vec;
+mod regex_builder;
 mod wrapper;
 
 fn main() -> ExitCode {
@@ -1015,7 +1015,7 @@ fn object_files(cx: &Context) -> Result<Vec<OsString>> {
     Ok(files)
 }
 
-fn pkg_hash_re(ws: &Workspace) -> Result<RegexVec> {
+fn pkg_hash_re(ws: &Workspace) -> Result<Regex> {
     let mut targets = BTreeSet::new();
     for id in &ws.metadata.workspace_members {
         let pkg = &ws.metadata.packages[id];
@@ -1024,7 +1024,7 @@ fn pkg_hash_re(ws: &Workspace) -> Result<RegexVec> {
             targets.insert(&t.name);
         }
     }
-    let mut re = RegexVecBuilder::new("^(lib)?(", ")(-[0-9a-f]+)?$");
+    let mut re = RegexBuilder::new("^(lib)?(", ")(-[0-9a-f]+)?$");
     for &t in &targets {
         re.or(&t.replace('-', "(-|_)"));
     }

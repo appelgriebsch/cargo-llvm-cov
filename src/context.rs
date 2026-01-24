@@ -8,6 +8,7 @@ use std::{
 
 use anyhow::{Result, bail};
 use camino::Utf8PathBuf;
+use regex::Regex;
 
 use crate::{
     cargo::Workspace,
@@ -15,7 +16,7 @@ use crate::{
     env,
     metadata::{Metadata, PackageId},
     process::ProcessBuilder,
-    regex_vec::{RegexVec, RegexVecBuilder},
+    regex_builder::RegexBuilder,
     term,
 };
 
@@ -25,7 +26,7 @@ pub(crate) struct Context {
     pub(crate) args: Args,
 
     pub(crate) workspace_members: WorkspaceMembers,
-    pub(crate) build_script_re: RegexVec,
+    pub(crate) build_script_re: Regex,
     pub(crate) current_dir: PathBuf,
 
     // Paths to executables.
@@ -278,8 +279,8 @@ impl Context {
     }
 }
 
-fn pkg_hash_re(ws: &Workspace, pkg_ids: &[PackageId]) -> RegexVec {
-    let mut re = RegexVecBuilder::new("^(", ")-[0-9a-f]+$");
+fn pkg_hash_re(ws: &Workspace, pkg_ids: &[PackageId]) -> Regex {
+    let mut re = RegexBuilder::new("^(", ")-[0-9a-f]+$");
     for id in pkg_ids {
         re.or(&ws.metadata.packages[id].name);
     }

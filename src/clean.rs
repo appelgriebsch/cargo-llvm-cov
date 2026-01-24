@@ -8,6 +8,7 @@ use std::path::Path;
 
 use anyhow::Result;
 use camino::Utf8Path;
+use regex::Regex;
 use walkdir::WalkDir;
 
 use crate::{
@@ -16,7 +17,7 @@ use crate::{
     context::Context,
     fs,
     metadata::PackageId,
-    regex_vec::{RegexVec, RegexVecBuilder},
+    regex_builder::RegexBuilder,
     term,
 };
 
@@ -154,8 +155,8 @@ fn clean_profraw_files(ws: &Workspace, verbose: bool) -> Result<()> {
     Ok(())
 }
 
-fn pkg_hash_re(ws: &Workspace, pkg_ids: &[PackageId]) -> RegexVec {
-    let mut re = RegexVecBuilder::new("^(lib)?(", ")(-[0-9a-f]{7,})?$");
+fn pkg_hash_re(ws: &Workspace, pkg_ids: &[PackageId]) -> Regex {
+    let mut re = RegexBuilder::new("^(lib)?(", ")(-[0-9a-f]{7,})?$");
     for id in pkg_ids {
         re.or(&ws.metadata.packages[id].name.replace('-', "(-|_)"));
     }
